@@ -7,10 +7,19 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { User } from 'src/users/entities/user.entity';
 import { UpdatePasswordDto } from 'src/users/dto/update-password.dto';
+import { Artist } from 'src/artists/entities/artist.entity';
+import { CreateArtistDto } from 'src/artists/dto/create-artist.dto';
+import { UpdateArtistDto } from 'src/artists/dto/update-artist.dto';
 
 @Injectable()
 export class InMemoryDbService {
   private users: User[] = [];
+  private artists: Artist[] = [];
+
+  // User
+  findAllUsers(): User[] {
+    return this.users;
+  }
 
   createUser(createUserDto: CreateUserDto) {
     const newUser = new User();
@@ -30,10 +39,6 @@ export class InMemoryDbService {
       createdAt: newUser.createdAt,
       updatedAt: newUser.updatedAt,
     };
-  }
-
-  findAllUsers(): User[] {
-    return this.users;
   }
 
   findUserById(id: string): User | undefined {
@@ -75,5 +80,49 @@ export class InMemoryDbService {
       updatedUser: undefined,
       error: new NotFoundException('User not found'),
     };
+  }
+
+  // Artist
+  findAllArtists(): Artist[] {
+    return this.artists;
+  }
+
+  findArtistById(id: string): Artist | undefined {
+    return this.artists.find((artist) => artist.id === id);
+  }
+
+  createArtist(createArtistDto: CreateArtistDto) {
+    const newArtist = new Artist();
+
+    newArtist.id = uuidv4();
+    newArtist.name = createArtistDto.name;
+    newArtist.grammy = createArtistDto.grammy;
+
+    this.artists.push(newArtist);
+    return newArtist;
+  }
+
+  updateArtist(id: string, updateArtistDto: UpdateArtistDto) {
+    const artist = this.artists.find((artist) => artist.id === id);
+    if (artist) {
+      artist.name = updateArtistDto.name;
+      artist.grammy = updateArtistDto.grammy;
+      return {
+        updatedArtist: artist,
+      };
+    }
+    return {
+      updatedArtist: undefined,
+      error: new NotFoundException('Artist not found'),
+    };
+  }
+
+  removeArtistById(id: string): boolean {
+    const artist = this.artists.find((artist) => artist.id === id);
+    if (artist) {
+      this.artists = this.artists.filter((value) => value !== artist);
+      return true;
+    }
+    return false;
   }
 }
