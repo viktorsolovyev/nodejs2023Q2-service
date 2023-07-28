@@ -22,6 +22,7 @@ export class AlbumsService {
   update(id: string, updateAlbumDto: UpdateAlbumDto) {
     return this.db.updateAlbum(id, updateAlbumDto);
   }
+
   remove(id: string) {
     return this.db.removeAlbumById(id);
   }

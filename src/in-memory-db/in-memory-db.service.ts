@@ -13,12 +13,16 @@ import { UpdateArtistDto } from 'src/artists/dto/update-artist.dto';
 import { Album } from 'src/albums/entities/album.entity';
 import { CreateAlbumDto } from 'src/albums/dto/create-album.dto';
 import { UpdateAlbumDto } from 'src/albums/dto/update-album.dto';
+import { Track } from 'src/tracks/entities/track.entity';
+import { CreateTrackDto } from 'src/tracks/dto/create-track.dto';
+import { UpdateTrackDto } from 'src/tracks/dto/update-track.dto';
 
 @Injectable()
 export class InMemoryDbService {
   private users: User[] = [];
   private artists: Artist[] = [];
   private albums: Album[] = [];
+  private tracks: Track[] = [];
 
   // User
   findAllUsers(): User[] {
@@ -122,9 +126,13 @@ export class InMemoryDbService {
   }
 
   removeArtistById(id: string): boolean {
+    console.log(this.tracks);
     const artist = this.artists.find((artist) => artist.id === id);
     if (artist) {
       this.artists = this.artists.filter((value) => value !== artist);
+      this.tracks.forEach((track) => {
+        if (track.artistId === id) track.artistId = null;
+      });
       return true;
     }
     return false;
@@ -170,6 +178,57 @@ export class InMemoryDbService {
     const album = this.albums.find((album) => album.id === id);
     if (album) {
       this.albums = this.albums.filter((value) => value !== album);
+      this.tracks.forEach((track) => {
+        if (track.albumId === id) track.albumId = null;
+      });
+      return true;
+    }
+    return false;
+  }
+
+  // Track
+  findAllTracks(): Track[] {
+    return this.tracks;
+  }
+
+  findTrackById(id: string): Track | undefined {
+    return this.tracks.find((track) => track.id === id);
+  }
+
+  createTrack(createTrackDto: CreateTrackDto) {
+    const newTrack = new Track();
+
+    newTrack.id = uuidv4();
+    newTrack.name = createTrackDto.name;
+    newTrack.duration = createTrackDto.duration;
+    newTrack.artistId = createTrackDto.artistId;
+    newTrack.albumId = createTrackDto.albumId;
+
+    this.tracks.push(newTrack);
+    return newTrack;
+  }
+
+  updateTrack(id: string, updateTrackDto: UpdateTrackDto) {
+    const track = this.tracks.find((track) => track.id === id);
+    if (track) {
+      track.name = updateTrackDto.name;
+      track.duration = updateTrackDto.duration;
+      track.artistId = updateTrackDto.artistId;
+      track.albumId = updateTrackDto.albumId;
+      return {
+        updatedTrack: track,
+      };
+    }
+    return {
+      updatedTrack: undefined,
+      error: new NotFoundException('Track not found'),
+    };
+  }
+
+  removeTrackById(id: string): boolean {
+    const track = this.tracks.find((track) => track.id === id);
+    if (track) {
+      this.tracks = this.tracks.filter((value) => value !== track);
       return true;
     }
     return false;
