@@ -10,11 +10,15 @@ import { UpdatePasswordDto } from 'src/users/dto/update-password.dto';
 import { Artist } from 'src/artists/entities/artist.entity';
 import { CreateArtistDto } from 'src/artists/dto/create-artist.dto';
 import { UpdateArtistDto } from 'src/artists/dto/update-artist.dto';
+import { Album } from 'src/albums/entities/album.entity';
+import { CreateAlbumDto } from 'src/albums/dto/create-album.dto';
+import { UpdateAlbumDto } from 'src/albums/dto/update-album.dto';
 
 @Injectable()
 export class InMemoryDbService {
   private users: User[] = [];
   private artists: Artist[] = [];
+  private albums: Album[] = [];
 
   // User
   findAllUsers(): User[] {
@@ -121,6 +125,51 @@ export class InMemoryDbService {
     const artist = this.artists.find((artist) => artist.id === id);
     if (artist) {
       this.artists = this.artists.filter((value) => value !== artist);
+      return true;
+    }
+    return false;
+  }
+
+  // Album
+  findAllAlbums(): Album[] {
+    return this.albums;
+  }
+
+  findAlbumById(id: string): Album | undefined {
+    return this.albums.find((album) => album.id === id);
+  }
+
+  createAlbum(createAlbumDto: CreateAlbumDto) {
+    const newAlbum = new Album();
+
+    newAlbum.id = uuidv4();
+    newAlbum.name = createAlbumDto.name;
+    newAlbum.year = createAlbumDto.year;
+    newAlbum.artistId = null;
+    this.albums.push(newAlbum);
+    return newAlbum;
+  }
+
+  updateAlbum(id: string, updateAlbumDto: UpdateAlbumDto) {
+    const album = this.albums.find((album) => album.id === id);
+    if (album) {
+      album.name = updateAlbumDto.name;
+      album.year = updateAlbumDto.year;
+      album.artistId = updateAlbumDto.artistId;
+      return {
+        updatedAlbum: album,
+      };
+    }
+    return {
+      updatedAlbum: undefined,
+      error: new NotFoundException('Album not found'),
+    };
+  }
+
+  removeAlbumById(id: string): boolean {
+    const album = this.albums.find((album) => album.id === id);
+    if (album) {
+      this.albums = this.albums.filter((value) => value !== album);
       return true;
     }
     return false;
