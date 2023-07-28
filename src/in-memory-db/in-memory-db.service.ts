@@ -2,6 +2,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
@@ -16,6 +17,10 @@ import { UpdateAlbumDto } from 'src/albums/dto/update-album.dto';
 import { Track } from 'src/tracks/entities/track.entity';
 import { CreateTrackDto } from 'src/tracks/dto/create-track.dto';
 import { UpdateTrackDto } from 'src/tracks/dto/update-track.dto';
+import {
+  Favorites,
+  FavoritesResponse,
+} from 'src/favorites/entities/favorites.entity';
 
 @Injectable()
 export class InMemoryDbService {
@@ -23,6 +28,7 @@ export class InMemoryDbService {
   private artists: Artist[] = [];
   private albums: Album[] = [];
   private tracks: Track[] = [];
+  private favorites: Favorites = new Favorites();
 
   // User
   findAllUsers(): User[] {
@@ -126,13 +132,20 @@ export class InMemoryDbService {
   }
 
   removeArtistById(id: string): boolean {
-    console.log(this.tracks);
     const artist = this.artists.find((artist) => artist.id === id);
     if (artist) {
       this.artists = this.artists.filter((value) => value !== artist);
+
       this.tracks.forEach((track) => {
         if (track.artistId === id) track.artistId = null;
       });
+
+      this.albums.forEach((album) => {
+        if (album.artistId === id) album.artistId = null;
+      });
+
+      this.removeArtistFromFavorites(id);
+
       return true;
     }
     return false;
@@ -153,7 +166,7 @@ export class InMemoryDbService {
     newAlbum.id = uuidv4();
     newAlbum.name = createAlbumDto.name;
     newAlbum.year = createAlbumDto.year;
-    newAlbum.artistId = null;
+    newAlbum.artistId = createAlbumDto.artistId;
     this.albums.push(newAlbum);
     return newAlbum;
   }
@@ -178,9 +191,13 @@ export class InMemoryDbService {
     const album = this.albums.find((album) => album.id === id);
     if (album) {
       this.albums = this.albums.filter((value) => value !== album);
+
       this.tracks.forEach((track) => {
         if (track.albumId === id) track.albumId = null;
       });
+
+      this.removeAlbumFromFavorites(id);
+
       return true;
     }
     return false;
@@ -229,8 +246,114 @@ export class InMemoryDbService {
     const track = this.tracks.find((track) => track.id === id);
     if (track) {
       this.tracks = this.tracks.filter((value) => value !== track);
+      this.removeTrackFromFavorites(id);
       return true;
     }
     return false;
+  }
+
+  // Favorites
+  findAllFavorites(): FavoritesResponse {
+    const response = new FavoritesResponse();
+
+    this.artists.forEach((artist) => {
+      if (
+        this.favorites.artists.findIndex((value) => value === artist.id) > -1
+      ) {
+        response.artists.push(artist);
+      }
+    });
+
+    this.albums.forEach((album) => {
+      if (this.favorites.albums.findIndex((value) => value === album.id) > -1) {
+        response.albums.push(album);
+      }
+    });
+
+    this.tracks.forEach((track) => {
+      if (this.favorites.tracks.findIndex((value) => value === track.id) > -1) {
+        response.tracks.push(track);
+      }
+    });
+
+    return response;
+  }
+
+  addArtistToFavorites(id: string) {
+    const artistIndex = this.artists.findIndex((artist) => artist.id === id);
+    if (artistIndex === -1)
+      return {
+        hasBeenAdded: false,
+        error: new UnprocessableEntityException('Artist not found'),
+      };
+
+    if (this.favorites.artists.findIndex((value) => value === id) === -1) {
+      this.favorites.artists.push(id);
+    }
+    return {
+      hasBeenAdded: true,
+    };
+  }
+
+  removeArtistFromFavorites(id: string) {
+    const artistIndex = this.favorites.artists.findIndex(
+      (artistId) => artistId === id,
+    );
+    if (artistIndex === -1) return false;
+
+    this.favorites.artists.splice(artistIndex, 1);
+    return true;
+  }
+
+  addAlbumToFavorites(id: string) {
+    const albumIndex = this.albums.findIndex((album) => album.id === id);
+    if (albumIndex === -1)
+      return {
+        hasBeenAdded: false,
+        error: new UnprocessableEntityException('Album not found'),
+      };
+
+    if (this.favorites.albums.findIndex((value) => value === id) === -1) {
+      this.favorites.albums.push(id);
+    }
+    return {
+      hasBeenAdded: true,
+    };
+  }
+
+  removeAlbumFromFavorites(id: string) {
+    const albumIndex = this.favorites.albums.findIndex(
+      (albumId) => albumId === id,
+    );
+    if (albumIndex === -1) return false;
+
+    this.favorites.albums.splice(albumIndex, 1);
+    return true;
+  }
+
+  addTrackToFavorites(id: string) {
+    const trackIndex = this.tracks.findIndex((track) => track.id === id);
+    if (trackIndex === -1)
+      return {
+        hasBeenAdded: false,
+        error: new UnprocessableEntityException('Track not found'),
+      };
+
+    if (this.favorites.tracks.findIndex((value) => value === id) === -1) {
+      this.favorites.tracks.push(id);
+    }
+    return {
+      hasBeenAdded: true,
+    };
+  }
+
+  removeTrackFromFavorites(id: string) {
+    const trackIndex = this.favorites.tracks.findIndex(
+      (trackId) => trackId === id,
+    );
+    if (trackIndex === -1) return false;
+
+    this.favorites.tracks.splice(trackIndex, 1);
+    return true;
   }
 }
