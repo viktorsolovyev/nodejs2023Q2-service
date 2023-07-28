@@ -8,6 +8,8 @@ import {
   NotFoundException,
   HttpCode,
   Put,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { UUIDv4 } from 'src/dto/get-by-id.dto';
 import { UsersService } from './users.service';
@@ -18,6 +20,7 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
@@ -38,6 +41,7 @@ export class UsersController {
     throw new NotFoundException('User not found');
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   @HttpCode(200)
   update(@Param() param: UUIDv4, @Body() updatePasswordDto: UpdatePasswordDto) {

@@ -35,24 +35,18 @@ export class InMemoryDbService {
     return this.users;
   }
 
-  createUser(createUserDto: CreateUserDto) {
-    const newUser = new User();
-
-    newUser.id = uuidv4();
-    newUser.login = createUserDto.login;
-    newUser.password = createUserDto.password;
-    newUser.version = 1;
-    newUser.createdAt = Date.now();
-    newUser.updatedAt = newUser.createdAt;
+  createUser(createUserDto: CreateUserDto): User {
+    const newUser = new User({
+      id: uuidv4(),
+      login: createUserDto.login,
+      password: createUserDto.password,
+      version: 1,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
 
     this.users.push(newUser);
-    return {
-      id: newUser.id,
-      login: newUser.login,
-      version: newUser.version,
-      createdAt: newUser.createdAt,
-      updatedAt: newUser.updatedAt,
-    };
+    return newUser;
   }
 
   findUserById(id: string): User | undefined {
@@ -81,13 +75,7 @@ export class InMemoryDbService {
       user.password = updatePasswordDto.newPassword;
       user.updatedAt = Date.now();
       return {
-        updatedUser: {
-          id: user.id,
-          login: user.login,
-          version: user.version,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-        },
+        updatedUser: user,
       };
     }
     return {
