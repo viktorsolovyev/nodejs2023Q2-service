@@ -11,6 +11,7 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
+  app.enableCors();
 
   const file = await fs.readFile('./doc/api.yaml', 'utf8');
   const document = yaml.load(file) as OpenAPIObject;
