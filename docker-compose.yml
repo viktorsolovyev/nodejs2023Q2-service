@@ -13,7 +13,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: ${PGDATA}
     volumes:
-        - postgres:/var/lib/postgresql/data    
+      - postgres:${PGDATA}
     networks:
       - back-tier
     ports:
@@ -29,7 +29,7 @@ services:
       - '4000:4000'
     networks:
       - back-tier
-    restart: unless-stopped  
+    restart: unless-stopped
 networks:
   back-tier:
 volumes:
