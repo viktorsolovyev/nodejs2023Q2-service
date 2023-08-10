@@ -1,0 +1,36 @@
+version: '3.9'
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: db-image.Dockerfile
+    image: 'nodejs2023q2-service-postgres'
+    container_name: 'postgres'
+    environment:
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: ${PGDATA}
+    volumes:
+        - postgres:/var/lib/postgresql/data    
+    networks:
+      - back-tier
+    ports:
+      - '5432:5432'
+    restart: unless-stopped
+  app:
+    build:
+      context: .
+      dockerfile: app-image.Dockerfile
+    image: 'nodejs2023q2-service-app'
+    container_name: app
+    ports:
+      - '4000:4000'
+    networks:
+      - back-tier
+    restart: unless-stopped  
+networks:
+  back-tier:
+volumes:
+  postgres:
