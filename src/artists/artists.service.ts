@@ -1,28 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { InMemoryDbService } from 'src/in-memory-db/in-memory-db.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 
 @Injectable()
 export class ArtistsService {
-  constructor(private db: InMemoryDbService) {}
+  constructor(private db: PrismaService) {}
 
-  create(createArtistDto: CreateArtistDto) {
-    return this.db.createArtist(createArtistDto);
+  async create(createArtistDto: CreateArtistDto) {
+    return await this.db.createArtist(createArtistDto);
   }
 
-  findAll() {
-    return this.db.findAllArtists();
+  async findAll() {
+    return await this.db.findAllArtists();
   }
 
-  findOne(id: string) {
-    return this.db.findArtistById(id);
+  async findOne(id: string) {
+    return await this.db.findArtistById(id);
   }
 
-  update(id: string, updateArtistDto: UpdateArtistDto) {
-    return this.db.updateArtist(id, updateArtistDto);
+  async update(id: string, updateArtistDto: UpdateArtistDto) {
+    return await this.db.updateArtist(id, updateArtistDto);
   }
-  remove(id: string) {
-    return this.db.removeArtistById(id);
+  async remove(id: string) {
+    return await this.db.removeArtistById(id);
   }
 }

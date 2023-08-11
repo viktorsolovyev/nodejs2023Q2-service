@@ -19,19 +19,19 @@ export class ArtistsController {
   constructor(private readonly artistsService: ArtistsService) {}
 
   @Post()
-  create(@Body() createArtistDto: CreateArtistDto) {
-    return this.artistsService.create(createArtistDto);
+  async create(@Body() createArtistDto: CreateArtistDto) {
+    return await this.artistsService.create(createArtistDto);
   }
 
   @Get()
-  findAll() {
-    return this.artistsService.findAll();
+  async findAll() {
+    return await this.artistsService.findAll();
   }
 
   @Get(':id')
   @HttpCode(200)
-  findOne(@Param() param: UUIDv4) {
-    const existArtist = this.artistsService.findOne(param.id);
+  async findOne(@Param() param: UUIDv4) {
+    const existArtist = await this.artistsService.findOne(param.id);
     if (existArtist) {
       return existArtist;
     }
@@ -40,8 +40,11 @@ export class ArtistsController {
 
   @Put(':id')
   @HttpCode(200)
-  update(@Param() param: UUIDv4, @Body() updateArtistDto: UpdateArtistDto) {
-    const { updatedArtist, error } = this.artistsService.update(
+  async update(
+    @Param() param: UUIDv4,
+    @Body() updateArtistDto: UpdateArtistDto,
+  ) {
+    const { updatedArtist, error } = await this.artistsService.update(
       param.id,
       updateArtistDto,
     );
