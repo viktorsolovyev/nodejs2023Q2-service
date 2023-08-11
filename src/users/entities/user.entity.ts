@@ -1,6 +1,7 @@
-import { Exclude } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
+import { User as PrismaUser } from '@prisma/client';
 
-export class User {
+export class User implements PrismaUser {
   id: string; // uuid v4
   login: string;
 
@@ -8,8 +9,12 @@ export class User {
   password: string;
 
   version: number; // integer number, increments on update
-  createdAt: number; // timestamp of creation
-  updatedAt: number; // timestamp of last update
+
+  @Transform(({ value }) => value.getTime())
+  createdAt: Date; // timestamp of creation
+
+  @Transform(({ value }) => value.getTime())
+  updatedAt: Date; // timestamp of last update
 
   constructor(partial: Partial<User>) {
     Object.assign(this, partial);
