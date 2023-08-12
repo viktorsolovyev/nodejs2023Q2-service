@@ -19,19 +19,19 @@ export class TracksController {
   constructor(private readonly tracksService: TracksService) {}
 
   @Post()
-  create(@Body() createTrackDto: CreateTrackDto) {
-    return this.tracksService.create(createTrackDto);
+  async create(@Body() createTrackDto: CreateTrackDto) {
+    return await this.tracksService.create(createTrackDto);
   }
 
   @Get()
-  findAll() {
-    return this.tracksService.findAll();
+  async findAll() {
+    return await this.tracksService.findAll();
   }
 
   @Get(':id')
   @HttpCode(200)
-  findOne(@Param() param: UUIDv4) {
-    const track = this.tracksService.findOne(param.id);
+  async findOne(@Param() param: UUIDv4) {
+    const track = await this.tracksService.findOne(param.id);
     if (track) {
       return track;
     }
@@ -40,8 +40,8 @@ export class TracksController {
 
   @Put(':id')
   @HttpCode(200)
-  update(@Param() param: UUIDv4, @Body() updateTrackDto: UpdateTrackDto) {
-    const { updatedTrack, error } = this.tracksService.update(
+  async update(@Param() param: UUIDv4, @Body() updateTrackDto: UpdateTrackDto) {
+    const { updatedTrack, error } = await this.tracksService.update(
       param.id,
       updateTrackDto,
     );
@@ -51,8 +51,8 @@ export class TracksController {
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param() param: UUIDv4) {
-    if (!this.tracksService.remove(param.id)) {
+  async remove(@Param() param: UUIDv4) {
+    if (!(await this.tracksService.remove(param.id))) {
       throw new NotFoundException('Track not found');
     }
   }

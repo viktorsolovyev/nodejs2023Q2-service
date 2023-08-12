@@ -12,6 +12,8 @@ import { CreateArtistDto } from 'src/artists/dto/create-artist.dto';
 import { UpdateArtistDto } from 'src/artists/dto/update-artist.dto';
 import { CreateAlbumDto } from 'src/albums/dto/create-album.dto';
 import { UpdateAlbumDto } from 'src/albums/dto/update-album.dto';
+import { CreateTrackDto } from 'src/tracks/dto/create-track.dto';
+import { UpdateTrackDto } from 'src/tracks/dto/update-track.dto';
 
 @Global()
 @Injectable()
@@ -181,6 +183,54 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     });
     if (album) {
       await this.album.delete({ where: { id } });
+      return true;
+    }
+    return false;
+  }
+
+  // Track
+  async findAllTracks() {
+    return await this.track.findMany();
+  }
+
+  async findTrackById(id: string) {
+    return await this.track.findUnique({
+      where: { id: id },
+    });
+  }
+
+  async createTrack(createTrackDto: CreateTrackDto) {
+    return await this.track.create({
+      data: createTrackDto,
+    });
+  }
+
+  async updateTrack(id: string, updateTrackDto: UpdateTrackDto) {
+    const track = await this.track.findUnique({
+      where: { id: id },
+    });
+    if (track) {
+      const updatedTrack = await this.track.update({
+        where: { id },
+        data: updateTrackDto,
+      });
+
+      return {
+        updatedTrack: updatedTrack,
+      };
+    }
+    return {
+      updatedTrack: undefined,
+      error: new NotFoundException('Track not found'),
+    };
+  }
+
+  async removeTrackById(id: string): Promise<boolean> {
+    const track = await this.track.findUnique({
+      where: { id },
+    });
+    if (track) {
+      await this.track.delete({ where: { id } });
       return true;
     }
     return false;
