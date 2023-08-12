@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
   OnModuleInit,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
@@ -14,6 +15,7 @@ import { CreateAlbumDto } from 'src/albums/dto/create-album.dto';
 import { UpdateAlbumDto } from 'src/albums/dto/update-album.dto';
 import { CreateTrackDto } from 'src/tracks/dto/create-track.dto';
 import { UpdateTrackDto } from 'src/tracks/dto/update-track.dto';
+import { FavoritesResponse } from 'src/favorites/entities/favorites.entity';
 
 @Global()
 @Injectable()
@@ -234,5 +236,126 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       return true;
     }
     return false;
+  }
+
+  // Favorites
+  async findAllFavorites(): Promise<FavoritesResponse> {
+    const response = new FavoritesResponse();
+
+    response.artists = await this.artist_To_Favorites
+      .findMany({
+        include: {
+          artist: true,
+        },
+      })
+      .then((favs) => favs.map((fav) => fav.artist));
+
+    response.albums = await this.album_To_Favorites
+      .findMany({
+        include: {
+          album: true,
+        },
+      })
+      .then((favs) => favs.map((fav) => fav.album));
+
+    response.tracks = await this.track_To_Favorites
+      .findMany({
+        include: {
+          track: true,
+        },
+      })
+      .then((favs) => favs.map((fav) => fav.track));
+
+    return response;
+  }
+
+  async addArtistToFavorites(id: string) {
+    const artist = await this.artist.findUnique({
+      where: { id: id },
+    });
+    if (!artist)
+      return {
+        hasBeenAdded: false,
+        error: new UnprocessableEntityException('Artist not found'),
+      };
+
+    await this.artist_To_Favorites.create({
+      data: { artistId: id },
+    });
+    return {
+      hasBeenAdded: true,
+    };
+  }
+
+  async removeArtistFromFavorites(id: string) {
+    const artist = await this.artist.findUnique({
+      where: { id: id },
+    });
+    if (!artist) return false;
+
+    await this.artist_To_Favorites.delete({
+      where: { artistId: id },
+    });
+    return true;
+  }
+
+  async addAlbumToFavorites(id: string) {
+    const album = await this.album.findUnique({
+      where: { id: id },
+    });
+    if (!album)
+      return {
+        hasBeenAdded: false,
+        error: new UnprocessableEntityException('Album not found'),
+      };
+
+    await this.album_To_Favorites.create({
+      data: { albumId: id },
+    });
+    return {
+      hasBeenAdded: true,
+    };
+  }
+
+  async removeAlbumFromFavorites(id: string) {
+    const album = await this.album.findUnique({
+      where: { id: id },
+    });
+    if (!album) return false;
+
+    await this.album_To_Favorites.delete({
+      where: { albumId: id },
+    });
+    return true;
+  }
+
+  async addTrackToFavorites(id: string) {
+    const track = await this.track.findUnique({
+      where: { id: id },
+    });
+    if (!track)
+      return {
+        hasBeenAdded: false,
+        error: new UnprocessableEntityException('Track not found'),
+      };
+
+    await this.track_To_Favorites.create({
+      data: { trackId: id },
+    });
+    return {
+      hasBeenAdded: true,
+    };
+  }
+
+  async removeTrackFromFavorites(id: string) {
+    const track = await this.track.findUnique({
+      where: { id: id },
+    });
+    if (!track) return false;
+
+    await this.track_To_Favorites.delete({
+      where: { trackId: id },
+    });
+    return true;
   }
 }

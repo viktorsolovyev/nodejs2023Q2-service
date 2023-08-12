@@ -15,51 +15,57 @@ export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 
   @Get()
-  findAll() {
-    return this.favoritesService.findAll();
+  async findAll() {
+    return await this.favoritesService.findAll();
   }
 
   @Post('artist/:id')
   @HttpCode(201)
-  addArtist(@Param() param: UUIDv4) {
-    const { hasBeenAdded, error } = this.favoritesService.addArtist(param.id);
+  async addArtist(@Param() param: UUIDv4) {
+    const { hasBeenAdded, error } = await this.favoritesService.addArtist(
+      param.id,
+    );
     if (!hasBeenAdded) throw error;
   }
 
   @Delete('artist/:id')
   @HttpCode(204)
-  removeArtist(@Param() param: UUIDv4) {
-    if (!this.favoritesService.removeArtist(param.id)) {
+  async removeArtist(@Param() param: UUIDv4) {
+    if (!(await this.favoritesService.removeArtist(param.id))) {
       throw new NotFoundException('Artist is not favorite');
     }
   }
 
   @Post('album/:id')
   @HttpCode(201)
-  addAlbum(@Param() param: UUIDv4) {
-    const { hasBeenAdded, error } = this.favoritesService.addAlbum(param.id);
+  async addAlbum(@Param() param: UUIDv4) {
+    const { hasBeenAdded, error } = await this.favoritesService.addAlbum(
+      param.id,
+    );
     if (!hasBeenAdded) throw error;
   }
 
   @Delete('album/:id')
   @HttpCode(204)
-  removeAlbum(@Param() param: UUIDv4) {
-    if (!this.favoritesService.removeAlbum(param.id)) {
+  async removeAlbum(@Param() param: UUIDv4) {
+    if (!(await this.favoritesService.removeAlbum(param.id))) {
       throw new NotFoundException('Album is not favorite');
     }
   }
 
   @Post('track/:id')
   @HttpCode(201)
-  addTrack(@Param() param: UUIDv4) {
-    const { hasBeenAdded, error } = this.favoritesService.addTrack(param.id);
+  async addTrack(@Param() param: UUIDv4) {
+    const { hasBeenAdded, error } = await this.favoritesService.addTrack(
+      param.id,
+    );
     if (!hasBeenAdded) throw error;
   }
 
   @Delete('track/:id')
   @HttpCode(204)
-  removeTrack(@Param() param: UUIDv4) {
-    if (!this.favoritesService.removeTrack(param.id)) {
+  async removeTrack(@Param() param: UUIDv4) {
+    if (!(await this.favoritesService.removeTrack(param.id))) {
       throw new NotFoundException('Track is not favorite');
     }
   }

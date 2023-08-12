@@ -1,35 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { InMemoryDbService } from 'src/in-memory-db/in-memory-db.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class FavoritesService {
-  constructor(private db: InMemoryDbService) {}
+  constructor(private db: PrismaService) {}
 
-  findAll() {
-    return this.db.findAllFavorites();
+  async findAll() {
+    return await this.db.findAllFavorites();
   }
 
-  addArtist(id: string) {
-    return this.db.addArtistToFavorites(id);
+  async addArtist(id: string) {
+    return await this.db.addArtistToFavorites(id);
   }
 
-  removeArtist(id: string) {
-    return this.db.removeArtistFromFavorites(id);
+  async removeArtist(id: string) {
+    return await this.db.removeArtistFromFavorites(id);
   }
 
-  addAlbum(id: string) {
-    return this.db.addAlbumToFavorites(id);
+  async addAlbum(id: string) {
+    return await this.db.addAlbumToFavorites(id);
   }
 
-  removeAlbum(id: string) {
-    return this.db.removeAlbumFromFavorites(id);
+  async removeAlbum(id: string) {
+    return await this.db.removeAlbumFromFavorites(id);
   }
 
-  addTrack(id: string) {
-    return this.db.addTrackToFavorites(id);
+  async addTrack(id: string) {
+    return await this.db.addTrackToFavorites(id);
   }
 
-  removeTrack(id: string) {
-    return this.db.removeTrackFromFavorites(id);
+  async removeTrack(id: string) {
+    return await this.db.removeTrackFromFavorites(id);
   }
 }
