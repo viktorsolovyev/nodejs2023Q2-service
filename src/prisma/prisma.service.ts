@@ -10,6 +10,8 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UpdatePasswordDto } from 'src/users/dto/update-password.dto';
 import { CreateArtistDto } from 'src/artists/dto/create-artist.dto';
 import { UpdateArtistDto } from 'src/artists/dto/update-artist.dto';
+import { CreateAlbumDto } from 'src/albums/dto/create-album.dto';
+import { UpdateAlbumDto } from 'src/albums/dto/update-album.dto';
 
 @Global()
 @Injectable()
@@ -130,6 +132,55 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     });
     if (artist) {
       await this.artist.delete({ where: { id } });
+      return true;
+    }
+    return false;
+  }
+
+  // Album
+  async findAllAlbums() {
+    return await this.album.findMany();
+  }
+
+  async findAlbumById(id: string) {
+    return await this.album.findUnique({
+      where: { id: id },
+    });
+  }
+
+  async createAlbum(createAlbumDto: CreateAlbumDto) {
+    return await this.album.create({
+      data: createAlbumDto,
+    });
+  }
+
+  async updateAlbum(id: string, updateAlbumDto: UpdateAlbumDto) {
+    const album = await this.album.findUnique({
+      where: { id: id },
+    });
+
+    if (album) {
+      const updatedAlbum = await this.album.update({
+        where: { id },
+        data: updateAlbumDto,
+      });
+
+      return {
+        updatedAlbum: updatedAlbum,
+      };
+    }
+    return {
+      updatedAlbum: undefined,
+      error: new NotFoundException('Album not found'),
+    };
+  }
+
+  async removeAlbumById(id: string): Promise<boolean> {
+    const album = await this.album.findUnique({
+      where: { id },
+    });
+    if (album) {
+      await this.album.delete({ where: { id } });
       return true;
     }
     return false;

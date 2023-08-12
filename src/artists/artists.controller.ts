@@ -54,8 +54,8 @@ export class ArtistsController {
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param() param: UUIDv4) {
-    if (!this.artistsService.remove(param.id)) {
+  async remove(@Param() param: UUIDv4) {
+    if (!(await this.artistsService.remove(param.id))) {
       throw new NotFoundException('Artist not found');
     }
   }

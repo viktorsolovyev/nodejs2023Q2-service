@@ -19,19 +19,19 @@ export class AlbumsController {
   constructor(private readonly albumsService: AlbumsService) {}
 
   @Post()
-  create(@Body() createAlbumDto: CreateAlbumDto) {
-    return this.albumsService.create(createAlbumDto);
+  async create(@Body() createAlbumDto: CreateAlbumDto) {
+    return await this.albumsService.create(createAlbumDto);
   }
 
   @Get()
-  findAll() {
-    return this.albumsService.findAll();
+  async findAll() {
+    return await this.albumsService.findAll();
   }
 
   @Get(':id')
   @HttpCode(200)
-  findOne(@Param() param: UUIDv4) {
-    const existAlbum = this.albumsService.findOne(param.id);
+  async findOne(@Param() param: UUIDv4) {
+    const existAlbum = await this.albumsService.findOne(param.id);
     if (existAlbum) {
       return existAlbum;
     }
@@ -40,8 +40,8 @@ export class AlbumsController {
 
   @Put(':id')
   @HttpCode(200)
-  update(@Param() param: UUIDv4, @Body() updateAlbumDto: UpdateAlbumDto) {
-    const { updatedAlbum, error } = this.albumsService.update(
+  async update(@Param() param: UUIDv4, @Body() updateAlbumDto: UpdateAlbumDto) {
+    const { updatedAlbum, error } = await this.albumsService.update(
       param.id,
       updateAlbumDto,
     );
@@ -51,8 +51,8 @@ export class AlbumsController {
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param() param: UUIDv4) {
-    if (!this.albumsService.remove(param.id)) {
+  async remove(@Param() param: UUIDv4) {
+    if (!(await this.albumsService.remove(param.id))) {
       throw new NotFoundException('Album not found');
     }
   }
