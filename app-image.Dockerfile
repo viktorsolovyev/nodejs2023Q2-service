@@ -21,6 +21,7 @@ COPY --from=builder /app/doc ./doc
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/.env ./.env
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/test ./test
 
 EXPOSE 4000
 CMD [ "npm", "run", "start:migrate:prod" ]
