@@ -1,72 +1,52 @@
-# Home Library Service
+# Home Library Service: Containerization and Database (PostgreSQL) & ORM
 
 ## Prerequisites
 
 - Git - [Download & Install Git](https://git-scm.com/downloads).
 - Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
+- Docker - [Download & Install Docker](https://docs.docker.com/engine/install/)
 
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone -b develop-task2 https://github.com/viktorsolovyev/nodejs2023Q2-service.git
 ```
 
-## Installing NPM modules
+## Create and start containers
 
 ```
-npm install
-```
-
-## Running application
-
-```
-npm start
+docker compose up
 ```
 
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
 ## Testing
 
 After application running open new terminal and enter:
 
-To run all tests without authorization
-
 ```
-npm run test
+docker exec -it app npm run test
 ```
 
-To run only one of all test suites
+## Remove project
+
+1. Stop and remove containers, networks:
 
 ```
-npm run test -- <path to suite>
+docker compose down
 ```
 
-To run all test with authorization
+2. Remove images:
 
 ```
-npm run test:auth
+docker rmi nodejs2023q2-service-app
+docker rmi nodejs2023q2-service-postgres
 ```
 
-To run only specific test suite with authorization
+3. Remove volumes:
 
 ```
-npm run test:auth -- <path to suite>
+docker volume rm nodejs2023q2-service_postgres_data
+docker volume rm nodejs2023q2-service_postgres_logs
 ```
-
-### Auto-fix and format
-
-```
-npm run lint
-```
-
-```
-npm run format
-```
-
-### Debugging in VSCode
-
-Press <kbd>F5</kbd> to debug.
-
-For more information, visit: https://code.visualstudio.com/docs/editor/debugging
