@@ -16,8 +16,8 @@ services:
       - postgres:${PGDATA}
     networks:
       back-tier:
-        ipv4_address: 172.16.238.10
-        ipv6_address: 2001:3984:3989::10
+        ipv4_address: ${POSTGRES_IPv4}
+        ipv6_address: ${POSTGRES_IPv6}
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     restart: unless-stopped
@@ -33,15 +33,15 @@ services:
       - ${PORT}:${PORT}
     networks:
       back-tier:
-        ipv4_address: 172.16.238.11
-        ipv6_address: 2001:3984:3989::11
+        ipv4_address: ${APP_IPv4}
+        ipv6_address: ${APP_IPv6}
     restart: unless-stopped
 networks:
   back-tier:
     ipam:
       driver: default
       config:
-        - subnet: '172.16.238.0/24'
-        - subnet: '2001:3984:3989::/64'
+        - subnet: ${SUBNET_IPv4}
+        - subnet: ${SUBNET_IPv6}
 volumes:
   postgres:
