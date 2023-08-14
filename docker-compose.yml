@@ -12,8 +12,11 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: ${PGDATA}
+      PGLOGS: ${PGLOGS}
     volumes:
-      - postgres:${PGDATA}
+      - postgres_data:${PGDATA}
+      - postgres_logs:${PGLOGS}
+    command: postgres -c logging_collector=on -c log_destination=stderr -c log_directory=${PGLOGS}
     networks:
       back-tier:
         ipv4_address: ${POSTGRES_IPv4}
@@ -44,4 +47,5 @@ networks:
         - subnet: ${SUBNET_IPv4}
         - subnet: ${SUBNET_IPv6}
 volumes:
-  postgres:
+  postgres_data:
+  postgres_logs:
