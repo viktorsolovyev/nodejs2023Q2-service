@@ -19,16 +19,18 @@ services:
         ipv4_address: 172.16.238.10
         ipv6_address: 2001:3984:3989::10
     ports:
-      - '5432:5432'
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     restart: unless-stopped
   app:
     build:
       context: .
       dockerfile: app-image.Dockerfile
+    depends_on:
+      - postgres
     image: 'nodejs2023q2-service-app'
     container_name: app
     ports:
-      - '4000:4000'
+      - ${PORT}:${PORT}
     networks:
       back-tier:
         ipv4_address: 172.16.238.11
