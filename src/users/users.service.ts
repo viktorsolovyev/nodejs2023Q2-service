@@ -26,4 +26,8 @@ export class UsersService {
   async remove(id: string) {
     return await this.db.removeUserById(id);
   }
+
+  async findOneByLogin(login: string) {
+    return await this.db.findUserByLogin(login);
+  }
 }

@@ -42,6 +42,7 @@ export class UsersController {
     }
     throw new NotFoundException('User not found');
   }
+
   @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   @HttpCode(200)

@@ -7,6 +7,7 @@ import { TracksModule } from './tracks/tracks.module';
 import { InMemoryDbModule } from './in-memory-db/in-memory-db.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PrismaModule } from './prisma/prisma.module';
     InMemoryDbModule,
     FavoritesModule,
     PrismaModule,
+    AuthModule,
   ],
   providers: [AppService],
 })

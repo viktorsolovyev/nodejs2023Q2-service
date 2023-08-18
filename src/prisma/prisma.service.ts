@@ -92,6 +92,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     return false;
   }
 
+  async findUserByLogin(login: string) {
+    return await this.user.findFirst({
+      where: { login },
+    });
+  }
+
   // Artist
   async findAllArtists() {
     return await this.artist.findMany();
