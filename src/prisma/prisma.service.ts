@@ -16,7 +16,7 @@ import { UpdateAlbumDto } from 'src/albums/dto/update-album.dto';
 import { CreateTrackDto } from 'src/tracks/dto/create-track.dto';
 import { UpdateTrackDto } from 'src/tracks/dto/update-track.dto';
 import { FavoritesResponse } from 'src/favorites/entities/favorites.entity';
-import bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcryptjs';
 
 @Global()
 @Injectable()
@@ -54,7 +54,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     });
 
     if (user) {
-      if (!bcrypt.compare(updatePasswordDto.oldPassword, user.password)) {
+      if (
+        !(await bcrypt.compare(updatePasswordDto.oldPassword, user.password))
+      ) {
         return {
           updatedUser: undefined,
           error: new ForbiddenException('Old password is wrong'),
