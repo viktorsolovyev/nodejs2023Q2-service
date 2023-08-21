@@ -8,13 +8,7 @@ import { AuthGuard } from './auth.guard';
 
 @Global()
 @Module({
-  imports: [
-    UsersModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET_KEY,
-      signOptions: { expiresIn: '5m' },
-    }),
-  ],
+  imports: [UsersModule, JwtModule],
   controllers: [AuthController],
   providers: [
     AuthService,

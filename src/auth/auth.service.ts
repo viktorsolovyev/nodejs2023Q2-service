@@ -12,14 +12,26 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login(authDto: AuthDto): Promise<{ accessToken: string }> {
+  async login(
+    authDto: AuthDto,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const user = await this.usersService.findOneByLogin(authDto.login);
     if (!(await bcrypt.compare(authDto.password, user?.password))) {
       throw new ForbiddenException('Unauthorized');
     }
     const payload = { sub: user.id, login: user.login };
+    const accessToken = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_SECRET_KEY,
+      expiresIn: process.env.TOKEN_EXPIRE_TIME,
+    });
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_SECRET_REFRESH_KEY,
+      expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME,
+    });
+
     return {
-      accessToken: await this.jwtService.signAsync(payload),
+      accessToken,
+      refreshToken,
     };
   }
 

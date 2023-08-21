@@ -40,7 +40,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     return await this.user.create({
       data: {
         login: createUserDto.login,
-        password: await bcrypt.hash(createUserDto.password, 8),
+        password: await bcrypt.hash(
+          createUserDto.password,
+          +process.env.CRYPT_SALT,
+        ),
         version: 1,
         createdAt: new Date(Date.now()),
         updatedAt: new Date(Date.now()),
