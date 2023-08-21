@@ -16,6 +16,7 @@ import { UpdateAlbumDto } from 'src/albums/dto/update-album.dto';
 import { CreateTrackDto } from 'src/tracks/dto/create-track.dto';
 import { UpdateTrackDto } from 'src/tracks/dto/update-track.dto';
 import { FavoritesResponse } from 'src/favorites/entities/favorites.entity';
+import bcrypt from 'bcryptjs';
 
 @Global()
 @Injectable()
@@ -39,7 +40,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     return await this.user.create({
       data: {
         login: createUserDto.login,
-        password: createUserDto.password,
+        password: await bcrypt.hash(createUserDto.password, 8),
         version: 1,
         createdAt: new Date(Date.now()),
         updatedAt: new Date(Date.now()),
@@ -53,7 +54,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     });
 
     if (user) {
-      if (user.password !== updatePasswordDto.oldPassword) {
+      if (!bcrypt.compare(updatePasswordDto.oldPassword, user.password)) {
         return {
           updatedUser: undefined,
           error: new ForbiddenException('Old password is wrong'),
