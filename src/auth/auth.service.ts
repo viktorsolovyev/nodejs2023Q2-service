@@ -10,14 +10,14 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login(authDto: AuthDto): Promise<{ access_token: string }> {
+  async login(authDto: AuthDto): Promise<{ accessToken: string }> {
     const user = await this.usersService.findOneByLogin(authDto.login);
     if (user?.password !== authDto.password) {
       throw new ForbiddenException('Unauthorized');
     }
     const payload = { sub: user.id, login: user.login };
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      accessToken: await this.jwtService.signAsync(payload),
     };
     // const { password, ...result } = user;
     // TODO: Generate a JWT and return it here
