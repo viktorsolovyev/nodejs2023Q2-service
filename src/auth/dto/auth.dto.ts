@@ -7,3 +7,8 @@ export class AuthDto {
   @IsNotEmpty()
   password: string;
 }
+
+export class RefreshDto {
+  @IsNotEmpty()
+  refreshToken: string;
+}
